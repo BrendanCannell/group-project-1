@@ -84,16 +84,16 @@ function fromApi(url){
         var dateParsed = (date.split('T')[0]);
 
         Obj.pubDate.push(dateParsed);
+        // to the console 
         console.log(Obj);
-
+        // out to display on the screen
         var nDiv = $("<div>");
         // pTag.html("<p>" + j + "</p>");
         nDiv.append("<p class='display'> Published Date: " + dateParsed + "</p>");
         nDiv.append("<p class='display'> Headline: " + result.response.docs[j].headline.main + "</p>");
         nDiv.append("<p class='display'> Snippet: " + result.response.docs[j].snippet + "</p>");
         nDiv.append("<a href=" + result.response.docs[j].web_url + ">"+result.response.docs[j].web_url+"</a>");
-       
-        
+               
         $("#head").append(nDiv);
       };
   
