@@ -55,6 +55,7 @@ function render() {
     c3.generate({
       bindto: '#chart',
       data: {
+        onclick: console.log,
         x: 'date',
         columns: [
           ['date', ...state.dataset.dates],
