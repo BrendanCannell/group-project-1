@@ -7,7 +7,7 @@ var state = {
     date: '2000-01-01',
     url: ''
   }],
-  input: '',
+  input: '', // Search box
 };
 
 // Fetch dataset `code` from Quand. `valIndex` is the array index of the desired value column. Takes a `callback` to call with the processed response data.
@@ -55,7 +55,7 @@ function render() {
     c3.generate({
       bindto: '#chart',
       data: {
-        onclick: console.log,
+        onclick: (d) => console.log(d), // Chart click handler
         x: 'date',
         columns: [
           ['date', ...state.dataset.dates],
