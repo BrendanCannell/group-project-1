@@ -1,41 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<!DOCTYPE <!DOCTYPE html>
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>News-Driven Finance Tracker</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    
+  
+    <script
+  src="https://code.jquery.com/jquery-3.3.1.js"
+  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
 </head>
-
 <body>
-  <div id="app">
-    <div id="data-selection">
-
+    
+<h2> From NYT </h2>
+<form>
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="inputSearch">Search in NYT </label>
+      <input type="text" class="form-control" id="search">
+      
     </div>
-    <div id="news-selection">
-      <form>
-        <input type="text">
-        <button>Search</button>
-      </form>
-    </div>
-    <div id="chart">
+    
+  </div>
+  <input type="submit" class="btn btn-primary submit"></input>
+</form>
+<!-- Quandl -->
+<h2> From Quandl </h2>
+<h3 >Growth</h3>
+<div id="growth"></div>
+<h3>Prices and Interest</h3>
+<div id="pI"></div>
+<h3>Money and Supply</h3>	
+<div id="mS"></div>
+<h3>Interest Rate</h3>
+<div id="iR"></div>
+<h3>Debt</h3>	
+<div id="debt"></div>
+<h3>Income and Expenditure</h3>	
+<div id="InE"></div>
+<h3 >Emplooyment</h3>		
+<div id="unemp"></div>
+<h3>Other Economic Indicator</h3>
+<div id="others"></div>
 
-    </div>
-    <div id="news">
 
+<div id="buttons"></div>
+
+<hr>
+<div id="head"></div>
+
+  
+</div>
+<div>
+  <table id="myTable">
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+<div class="row mb-2">
+  <div class="col-md-6">
+    <div class="card flex-md-row mb-4 shadow-sm h-md-250">
+      <div class="card-body d-flex flex-column align-items-start">
+        <h3 class="mb-0">
+          <a class="text-dark" href="#">Featured post</a>
+        </h3>
+        <div class="mb-1 text-muted">Nov 12</div>
+        <p class="card-text mb-auto">This is a wider card with supporting text below as a natural lead-in to additional content.</p>
+        <a href="#">Continue reading</a>
+      </div>
     </div>
   </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-    crossorigin="anonymous"></script>
-
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.8/c3.min.css" rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.8/c3.min.js"></script>
-
-  <script src="assets/js/brendans-examples.js"></script>
-  <script src="assets/js/program.js"></script>
+  <div class="col-md-6">
+    <div class="card flex-md-row mb-4 shadow-sm h-md-250">
+      <div class="card-body d-flex flex-column align-items-start">
+        <strong class="d-inline-block mb-2 text-success">Design</strong>
+        <h3 class="mb-0">
+          <a class="text-dark" href="#">Post title</a>
+        </h3>
+        <div class="mb-1 text-muted">Nov 11</div>
+        <p class="card-text mb-auto">This is a wider card with supporting text below as a natural lead-in to additional content.</p>
+        <a href="#">Continue reading</a>
+      </div>
+      <img class="card-img-right flex-auto d-none d-lg-block" data-src="holder.js/200x250?theme=thumb" alt="Card image cap">
+    </div>
+  </div>
+</div>
+<script src="main.js"></script>
 </body>
-
 </html>
