@@ -1,5 +1,15 @@
-#articleButtons {
-    margin: 5px auto;
+.btn {
+    cursor: pointer;
+    width: 70px;
+    margin: 0 3px;
 }
 
 
+.articleButtons {
+    margin: 5px;
+}
+
+#year {
+    width: 70px;
+    text-align: center;
+}
