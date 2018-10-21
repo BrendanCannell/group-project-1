@@ -3,6 +3,7 @@ $(document).ready(function() {
 
     var userSearchTerm;
     var year;
+    var imgSrc;
 
     
     $("#searchArticle").on("click", function(event) {
@@ -11,7 +12,6 @@ $(document).ready(function() {
 
         userSearchTerm = $("#searchInput").val().trim();
         year = parseInt($("#year").val());
-        console.log(year);
     
         renderArticles();
         
@@ -23,7 +23,6 @@ $(document).ready(function() {
 
         year = parseInt($("#year").val());
         year = year + 1; 
-        console.log(year);
         $("#year").val(year);   
         renderArticles();
         
@@ -35,7 +34,6 @@ $(document).ready(function() {
 
         year = parseInt($("#year").val());
         year = year - 1; 
-        console.log(year);
         $("#year").val(year);   
         renderArticles();
         
@@ -55,9 +53,6 @@ $(document).ready(function() {
     function renderArticles() {
 
 
-        console.log(year);
-        console.log(userSearchTerm);
-
         if (userSearchTerm !== "" && year) {
 
             $("#searchInput").val("");
@@ -74,31 +69,28 @@ $(document).ready(function() {
                         url: url,
                         method: 'GET',
                     }).done(function(result) {
-                        console.log(result);
                         var test = result;
-                        console.log(test.response.docs.length);
-                    
-                    
                 
                     for (var i = 0; i < 10; i++) {
 
                         if (test.response.docs[i].keywords.length !== 0) {
                     
-                            
-                    
-                            var imagElement = $("<img>");
-                        // $(imagElement).attr("src", image).attr("data-img", image).attr("data-vid", video).attr("data-live", "no");
-                        
-                            var buttonHeadline = $("<button>");
-                            var headlineLink = $("<a href='" + test.response.docs[i].web_url + "' target='_blank'>");
-                            var pHolder = $("<p class='articleButtons'>");
+
+                            var headlineLink = test.response.docs[i].web_url;
+                            var headliner = test.response.docs[i].headline.main;
+                            var imageCheck = test.response.docs[i].multimedia.length;
+                            var bodyText = test.response.docs[i].snippet;
+                            if (imageCheck) {
+
+                              imgSrc = "https://static01.nyt.com/" + test.response.docs[i].multimedia[2].url;
+                            }
+                            else {
+                              imgSrc = "assets/images/chart.png";
+                            }
+
+                            var articleCard = $("<div class='card articleCard'><div class='card-body'><h4 class='card-title'>" + headliner + "</h4><img class='rounded articleImg' src='" + imgSrc + "'</img><p class='card-text'>" + bodyText + "</p><a href='" + headlineLink + "' target='_blank' class='btn btn-primary toArticleButton'>See Full Article</a></div></div>");
                 
-                            $(buttonHeadline).append(test.response.docs[i].headline.main);
-                            $(headlineLink).append(buttonHeadline);
-                            $(pHolder).append(headlineLink);
-                
-                        
-                            $("#article-section").prepend(pHolder);
+                            $("#article-section").prepend(articleCard);
                                 
                         }
                     }
