@@ -7,11 +7,14 @@ var state = {
     date: '2000-01-01',
     url: ''
   }],
-  input: '', // Search box
+  dataQuery: 'WIKI/FB', // Search box
+  newsQuery: 'Facebook',
+  newsBegin: '2014-01-01',
+  newsEnd: '2016-01-01'
 };
 
 // Fetch dataset `code` from Quand. `valIndex` is the array index of the desired value column. Takes a `callback` to call with the processed response data.
-function getTimeSeries(code, valIndex, callback) {
+function fetchTimeSeries(code, valIndex, callback) {
   $.ajax({
     method: 'GET',
     url: 'https://www.quandl.com/api/v3/datasets/' + code + '/data.json?api_key=UgyTCPiRsSybMnmGJJKA'
@@ -21,24 +24,56 @@ function getTimeSeries(code, valIndex, callback) {
   }));
 }
 
+function fetchArticles(query, beginDate, endDate, callback) {
+  function format(date) {
+    return date.toISOString().match(/^(\d\d\d\d)-(\d\d)-(\d\d)/).slice(1).join('');
+  }
+
+  $.ajax({
+    url: 'https://api.nytimes.com/svc/search/v2/articlesearch.json?'
+      + $.param({
+        'api-key': '33d24445c695491bb4645a00e949c71f',
+        'q': query,
+        'fq': 'news_desk:("Business")',
+        'begin_date': "" + beginDate.getFullYear() + "0101", // format(beginDate),
+        'end_date': "" + beginDate.getFullYear() + "1231", // format(endDate),
+        'fl': "headline,snippet,web_url,pub_date,news_desk"
+      })
+  }).done(response => callback(response.response.docs.map(doc => {
+    return {
+      headline: doc.headline,
+      snippet: doc.snippet,
+      url: doc.web_url,
+      date: doc.pub_date
+    }
+  })));
+}
+
 // Event handler for the submit button
-function submitQuery(event) {
+function submitDataQuery(event) {
   event.preventDefault();
-  getTimeSeries(state.input, 1, (data) => {
+  fetchTimeSeries(state.dataQuery, 1, (data) => {
     state.dataset = data;
     render();
   });
 }
 
+var chart = null;
+
 function render() {
   $('div#app').empty().append(
-    $('<div id="news-selection">').append(
-      $('<form>').on('submit', submitQuery).append(
-        $('<input class="query" type="text">')
-          .val(state.input)
-          .on('change', (e) => state.input = $(e.currentTarget).val()),
+    $('<div id="data-selection">').append(
+      $('<form>').on('submit', submitDataQuery).append(
+        $('<input class="query" type="text" placeholder="Dataset code">')
+          .val(state.dataQuery)
+          .on('change', (e) => state.dataQuery = $(e.currentTarget).val()),
         $('<input type="submit">')
           .val("Search"))
+    ),
+    $('<div id="news-selection">').append(
+      $('<input class="query" type="text" placeholder="Search news">')
+        .val(state.newsQuery)
+        .on('change', (e) => state.newsQuery = $(e.currentTarget).val())
     ),
     $('<div id="chart">'),
     $('<div id="news">').append(
@@ -48,19 +83,24 @@ function render() {
           $('<h2>').text(article.headline),
           $('<p>').text(article.snippet)
         )
-    ))
+      ))
   );
 
   if (state.dataset) {
-    c3.generate({
+    chart = c3.generate({
       bindto: '#chart',
       data: {
-        onclick: (d) => console.log(d), // Chart click handler
-        x: 'date',
+        onclick: (d) => fetchArticles(state.newsQuery, d.x, d.x), // Chart click handler
+        xs: {
+          'datasetValues': 'datasetDates',
+          'newsControlsY': 'newsControls'
+        },
         columns: [
-          ['date', ...state.dataset.dates],
-          ['value', ...state.dataset.values]
-        ]
+          ['datasetDates', ...state.dataset.dates],
+          ['datasetValues', ...state.dataset.values],
+          ['newsControls', state.newsBegin, state.newsEnd],
+          ['newsControlsY', 0, 0]
+        ],
       },
       axis: {
         x: {
@@ -70,9 +110,21 @@ function render() {
             format: '%Y-%m-%d'
           }
         }
-      }
+      },
+      // point: {
+      //   show: false
+      // }
     });
   }
 }
 
 render();
+
+function load() {
+  chart.load({
+    json: [
+      { date2: "2014-01-01", value: 0 },
+      { date2: "2016-01-01", value: 0 },
+    ]
+  })
+}
