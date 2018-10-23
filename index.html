@@ -6,6 +6,9 @@
   <title>New York Times Search</title>
   <!-- Bootstrap CSS CDN  -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" />
+  <!--Moment JS-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+
 
   <!-- Font Awesome CSS Icons (For cool glyphicons) -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" />
@@ -29,36 +32,50 @@
 
     <!-- Row for Searching New York Times -->
     <div class="row">
-      
-        <div class="input-group">
-            <input type="text" class="form-control" id="searchInput" placeholder="Search for Articles" aria-label="" aria-describedby="basic-addon1">
-            <div class="input-group-append-6">
-              <button class="btn btn-secondary-2" type="button" id="searchArticle">Search</button>
+           <!--Keyword Field-->
+           <div class="input-group">
+              <input type="text" class="form-control" id="searchInput" placeholder="Enter Keyword(s)" aria-label="" aria-describedby="basic-addon1">
+           <!--Month Search Field-->
+            <div class="btn-group">
+              <button type="button" id="dropdownMonth" style="width:100px" class="btn btn-secondary-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Month
+              </button>
+              <div class="dropdown-menu">
+                <button class="dropdown-item" type="button" data-mon="01">Jan.</button><button class="dropdown-item" type="button" data-mon="02">Feb.</button><button class="dropdown-item" type="button" data-mon="03">Mar.</button>
+                <button class="dropdown-item" type="button" data-mon="04">Apr.</button><button class="dropdown-item" type="button" data-mon="05">May</button><button class="dropdown-item" type="button" data-mon="06">June</button>
+                <button class="dropdown-item" type="button" data-mon="07">July</button><button class="dropdown-item" type="button" data-mon="08">Aug.</button><button class="dropdown-item" type="button" data-mon="09">Sept.</button>
+                <button class="dropdown-item" type="button" data-mon="10">Oct.</button><button class="dropdown-item" type="button" data-mon="11">Nov.</button><button class="dropdown-item" type="button" data-mon="12">Dec.</button>
+              </div>
             </div>
-            <div class="input-group-prepend">
+            <!--Year Search Field-->
+            <div class="input-group-prepend-6">
                 <button class="btn btn-secondary-2" type="button" id="previousYear">- Year</button>
               </div>
               <input type="text" class="form-control-4" id="year">
-              <div class="input-group-append">
+              <div class="input-group-append-6">
                   <button class="btn btn-secondary-2" type="button" id="nextYear">+ Year</button>
               </div>
+              <!--search button-->
+               <div class="input-group-append-6">
+               <button class="btn btn-secondary-2" type="button" id="searchArticle">Search</button>
+          </div>
               <div>
               <button class="btn btn-secondary-2" type="button" id="clear">Clear</button>
               </div>
           </div>
     </div>
-    <!-- This row will handle all of the retrieved articles -->
+
     <div class="row">
       <div class="col-sm-12">
         <br>
 
-        <!-- This card will initially be made up of a card and wells for each of the articles retrieved -->
+        
         <div class="card">
 
           <!-- card Heading for the retrieved articles box -->
           <div class="card-header">
             <strong>
-              <i class="fa fa-table"></i>Related Articles</strong>
+              <i class="fa fa-table"></i>Related Articles</strong><span id="errorField"></span>
           </div>
 
           <!-- This main card will hold each of the resulting articles -->
