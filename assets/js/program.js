@@ -10,7 +10,7 @@ var state = {
   input: '',
 };
 
-// Fetch dataset `code` from Quand. `valIndex` is the array index of the desired value column. Takes a `callback` to call with the processed response data.
+// Fetch dataset `code` from Quandl. `valIndex` is the array index of the desired value column. Takes a `callback` to call with the processed response data.
 function getTimeSeries(code, valIndex, callback) {
   $.ajax({
     method: 'GET',
@@ -31,7 +31,8 @@ function submitQuery(event) {
 }
 
 function render() {
-  $('div#app').empty().append(
+  //changed selector to empty div "#news" below Articles header
+  $('#news').empty().append(
     $('<div id="news-selection">').append(
       $('<form>').on('submit', submitQuery).append(
         $('<input class="query" type="text">')
@@ -40,9 +41,9 @@ function render() {
         $('<input type="submit">')
           .val("Search"))
     ),
-    $('<div id="chart">'),
-    $('<div id="news">').append(
-      $('<h1>News</h1>'),
+    // $('<div id="chart">'),
+    $("#news").append(
+      // $('<h1>News</h1>'),
       state.articles.map((article) =>
         $('<div class="article">').append(
           $('<h2>').text(article.headline),
@@ -75,4 +76,11 @@ function render() {
   }
 }
 
-render();
+
+function main() {
+  render();
+}
+
+window.onload = function() {
+  main();
+}
