@@ -92,14 +92,11 @@ function render() {
       data: {
         onclick: (d) => fetchArticles(state.newsQuery, d.x, d.x, (articles) => {state.articles = articles; render()}), // Chart click handler
         xs: {
-          'datasetValues': 'datasetDates',
-          'newsControlsY': 'newsControls'
+          'datasetValues': 'datasetDates'
         },
         columns: [
           ['datasetDates', ...state.dataset.dates],
-          ['datasetValues', ...state.dataset.values],
-          ['newsControls', state.newsBegin, state.newsEnd],
-          ['newsControlsY', 0, 0]
+          ['datasetValues', ...state.dataset.values]
         ],
       },
       axis: {
