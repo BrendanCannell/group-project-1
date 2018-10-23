@@ -41,7 +41,7 @@ function fetchArticles(query, beginDate, endDate, callback) {
       })
   }).done(response => callback(response.response.docs.map(doc => {
     return {
-      headline: doc.headline,
+      headline: doc.headline.main,
       snippet: doc.snippet,
       url: doc.web_url,
       date: doc.pub_date
@@ -90,7 +90,7 @@ function render() {
     chart = c3.generate({
       bindto: '#chart',
       data: {
-        onclick: (d) => fetchArticles(state.newsQuery, d.x, d.x), // Chart click handler
+        onclick: (d) => fetchArticles(state.newsQuery, d.x, d.x, (articles) => {state.articles = articles; render()}), // Chart click handler
         xs: {
           'datasetValues': 'datasetDates',
           'newsControlsY': 'newsControls'
