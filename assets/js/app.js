@@ -14,22 +14,38 @@ class App {
           current: null,
           pending: null
         }
-      }
+      },
+      message: "Type in a Ticker to Display Stock Price Graph",
+      chart: {
+        element: $('<div id="chart">'),
+        c3: null
+      },
     });
   }
 
+  // Wrap `localStorage` item 'favs' as a property
+  get favs() {
+    return JSON.parse(localStorage.getItem('favs')) || [];
+  }
+  set favs(arr) {
+    localStorage.setItem('favs', JSON.stringify(arr));
+  }
+
   update() {
-    // Pending queries are moved to current if ready.
-    function swapIfReady(queryPair) {
-      let qp = queryPair;
-      if (qp.pending && qp.pending.success) {
-        qp.current = qp.pending;
-        qp.pending = null;
-      }
+    // Pending queries are moved to current if successful.
+    let s = this.queries.stock;
+    if (s.pending && s.pending.success) {
+      s.current = s.pending;
+      s.pending = null;
+      // this.chart && this.chart.destroy();
+      // this.chart = null;
     }
 
-    swapIfReady(this.queries.stock);
-    swapIfReady(this.queries.news);
+    let n = this.queries.news;
+    if (n.pending && n.pending.success) {
+      n.current = n.pending;
+      n.pending = null;
+    }
 
     this.render();
   }
@@ -38,25 +54,25 @@ class App {
     let stock = this.queries.stock.current;
     let news = this.queries.news.current;
 
+    // Keeps `$($arg)` synced with `obj[prop]`. Otherwise forms would get cleared on every render.
+    function $sync($arg, obj, prop) {
+      return $($arg).val(obj[prop]).on('change', (e) => obj[prop] = $(e.currentTarget.val()));
+    }
+
     $(this.bindto).empty().append(
       $('<div id="data-selection">').append(
         $('<form>').append(
-          $('<input class="query" type="text" placeholder="Dataset code">')
-            .val(this.stockQueryInput)
-            .on('change', (e) => this.stockQueryInput = $(e.currentTarget).val()),
+          $sync('<input class="query" type="text" placeholder="Dataset code">', this, 'stockQueryInput'),
           $('<input type="submit" value="Search">')
-            .val("Search"))
-          .on('submit', (e) => {
-            e.preventDefault();
-            this.queries.stock.pending = new StockQuery(this.stockQueryInput, this.update.bind(this))
-          })
+        ).on('submit', (e) => {
+          e.preventDefault();
+          this.queries.stock.pending = new StockQuery(this.stockQueryInput, this.update.bind(this))
+        })
       ),
       $('<div id="news-selection">').append(
-        $('<input class="query" type="text" placeholder="Search news">')
-          .val(this.newsQueryInput)
-          .on('change', (e) => this.newsQueryInput = $(e.currentTarget).val())
+        $sync('<input class="query" type="text" placeholder="Search news">', this, 'newsQueryInput')
       ),
-      $('<div id="chart">'),
+      this.chart.element,
       $('<div id="news">').append(
         $('<h1>News</h1>'),
         news && news.success && news.articles.map((article) =>
@@ -67,29 +83,75 @@ class App {
         ))
     );
 
+    $(this.bindto).empty().append(
+      $("<div id='controls' class='card'>").append(
+        $("<h2 class='text-center'>").text(app.message),
+        $("<div class='row'>").append(
+          $("<div class='col-md-3'>"),
+
+          $("<div class='col-md-6'>").append(
+            $("<div class='row form-group'>").append(
+              $("<h4>").text("Ticker"),
+              $('<form>').append(
+                $sync('<input class="query" type="text" placeholder="Dataset code">', this, 'stockQueryInput'),
+                $('<input type="submit" value="Search">')
+              ).on('submit', (e) => {
+                e.preventDefault();
+                this.queries.stock.pending = new StockQuery(this.stockQueryInput, this.update.bind(this))
+              })),
+
+            $("<div class='row form-group'>").append(
+              $("<h4>").text("News"),
+              $sync('<input class="query" type="text" placeholder="Search news">', this, 'newsQueryInput')),
+
+            $("<div class='row form-group'>").append(
+              $("<h4>").text("Date"))),
+
+          $("<div class='col-md-3'>"))),
+
+      this.chart.element,
+      $('<div id="news">').append(
+        $('<h1>News</h1>'),
+        news && news.success && news.articles.map((article) =>
+          $('<div class="article">').append(
+            $('<h2>').text(article.headline),
+            $('<p>').text(article.snippet)))));
+
     if (stock && stock.success) {
-      c3.generate({
-        bindto: '#chart',
-        data: {
-          onclick: (d) => this.queries.news.pending = new NewsQuery(this.newsQueryInput, d.x.getFullYear(), d.x.getMonth(), this.update.bind(this)), // Chart click handler
-          xs: {
-            'datasetValues': 'datasetDates'
+      if (!this.chart.c3) {
+        this.chart.c3 = c3.generate({
+          bindto: this.bindto + ' #chart',
+          data: {
+            onclick: (d) => this.queries.news.pending = new NewsQuery(this.newsQueryInput, d.x.getFullYear(), d.x.getMonth(), this.update.bind(this)), // Chart click handler
+            xs: {
+              'datasetValues': 'datasetDates'
+            },
+            columns: [
+              ['datasetDates', ...stock.dataset.dates],
+              ['datasetValues', ...stock.dataset.values]
+            ],
           },
+          axis: {
+            x: {
+              type: 'timeseries',
+              tick: {
+                count: 10,
+                format: '%Y-%m-%d'
+              }
+            }
+          },
+          legend: {
+            show: false
+          }
+        });
+      } else {
+        this.chart.c3.load({
           columns: [
             ['datasetDates', ...stock.dataset.dates],
             ['datasetValues', ...stock.dataset.values]
-          ],
-        },
-        axis: {
-          x: {
-            type: 'timeseries',
-            tick: {
-              count: 10,
-              format: '%Y-%m-%d'
-            }
-          }
-        },
-      });
+          ]
+        })
+      }
     }
   }
 }
