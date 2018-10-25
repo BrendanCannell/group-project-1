@@ -1,12 +1,9 @@
 class StockQuery {
   constructor(symbol, update) {
-    Object.assign(this, {
-      symbol, update,
-      response: { // separate data and metadata API responses
-        data: null,
-        metadata: null,
-      }
-    })
+    this.response = observe({
+      data: null,
+      metadata: null,
+    }, update);
 
     // Send requests
     $.ajax({
@@ -15,7 +12,7 @@ class StockQuery {
       data: {
         api_key: 'UgyTCPiRsSybMnmGJJKA'
       }
-    }).always(chain(receiveAt(this.response, 'data'), this.update));
+    }).always(receiveAt(this.response, 'data'));
 
     $.ajax({
       method: 'GET',
@@ -23,10 +20,10 @@ class StockQuery {
       data: {
         api_key: 'UgyTCPiRsSybMnmGJJKA'
       }
-    }).always(chain(receiveAt(this.response, 'metadata'), this.update));
+    }).always(receiveAt(this.response, 'metadata'));
   }
 
-  get status() {
+  get success() {
     let d = this.response.data && this.response.data.statusText === 'success';
     let m = this.response.metadata && this.response.metadata.statusText === 'success';
 
@@ -38,7 +35,7 @@ class StockQuery {
   }
 
   get companyName() {
-    if (this.status) {
+    if (this.success) {
       let namePlusJunk = this.response.metadata.responseJSON.dataset.name;
       let companyName = namePlusJunk.match(/(.*?) \(/)[1]; // Extract the prefix before the first ' ('
 
@@ -48,7 +45,7 @@ class StockQuery {
   }
 
   get dataset() {
-    if (this.status) {
+    if (this.success) {
       let d = this.response.data.responseJSON.dataset_data;
       let valIndex = d.column_names.indexOf('Close');
       let dataset = {

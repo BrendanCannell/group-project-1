@@ -20,13 +20,16 @@ class App {
 
   update() {
     // Pending queries are moved to current if ready.
-    let qs = this.queries;
-    for (let q in qs) {
-      if (qs[q].pending && qs[q].pending.status) {
-        qs[q].current = qs[q].pending;
-        qs[q].pending = null;
+    function swapIfReady(queryPair) {
+      let qp = queryPair;
+      if (qp.pending && qp.pending.success) {
+        qp.current = qp.pending;
+        qp.pending = null;
       }
     }
+
+    swapIfReady(this.queries.stock);
+    swapIfReady(this.queries.news);
 
     this.render();
   }
@@ -56,7 +59,7 @@ class App {
       $('<div id="chart">'),
       $('<div id="news">').append(
         $('<h1>News</h1>'),
-        news && news.status && news.articles.map((article) =>
+        news && news.success && news.articles.map((article) =>
           $('<div class="article">').append(
             $('<h2>').text(article.headline),
             $('<p>').text(article.snippet)
@@ -64,7 +67,7 @@ class App {
         ))
     );
 
-    if (stock && stock.status) {
+    if (stock && stock.success) {
       c3.generate({
         bindto: '#chart',
         data: {
