@@ -8,12 +8,13 @@
   <title>News-Driven Finance Tracker</title>
 
   <!-- Link to Bootstrap library -->
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+    crossorigin="anonymous">
 </head>
 
 <body>
-   <div id="app">
-   </div>
+  <div id="app">
+  </div>
 
   <!--link to Jquery  -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
@@ -25,8 +26,16 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.6.8/c3.min.js"></script>
 
   <!-- link to JS files -->
-  <script src="assets/js/brendans-examples.js"></script>
-  <script src="assets/js/program.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/stockquery.js"></script>
+  <script src="assets/js/newsquery.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script>
+    let app = new App('div#app');
+    app.stockQueryInput = 'FB';
+    app.newsQueryInput = 'Facebook';
+    app.update();
+  </script>
 </body>
 
 </html>
