@@ -2,70 +2,79 @@
 $(document).ready(function() {
 
     var userSearchTerm;
-    var year;
+    var yearFrom;
+    var yearTo;
     var imgSrc;
-    var month;
+    var monthTo;
+    var monthFrom;
     var newDate;
     var endDate
+    /////slider Variables//////
+    var endDate;
+    var dayCount = 0;
+    var $range1 = $("#slider1");
+    var $range2 = $("#slider2");
 
+
+    ///////Month Slider////////
+    moment.locale("en-US");
+
+    $range1.ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: 1,
+        max: 12,
+        from: 3,
+        to: 10,
+        step: 1,
+        grid_snap: true,
+        prettify: function (num) {
+        var date = num;
+        
+            if (dayCount === 0) {
+            monthFrom = moment(date, 'MM').format("MM"); 
+            dayCount++;
+            }
+            else if (dayCount = 1) {
+            monthTo = moment(date, 'MM').format("MM"); 
+            dayCount = 0;
+            }
+
+            return moment(date, 'MM.YYYY').format("MMMM");
+
+        }
+    });
+
+    $range2.ionRangeSlider({
+        type: "double",
+        grid: true,
+        min: 1940,
+        max: 2018,
+        from: 1990,
+        to: 2010,
+        prettify_enabled: false,
+        onStart: function (data) {
+            yearFrom = data.from;
+            yearTo = data.to;
+        },
+        onChange: function (data) {
+            yearFrom = data.from;
+            yearTo = data.to;
+        }
+    });
     
     $("#searchArticle").on("click", function(event) {
         
         event.preventDefault();
 
-        userSearchTerm = $("#searchInput").val().trim();
-        year = parseInt($("#year").val());
+        userSearchTerm = $("#searchInput").val().trim()
 
-        if (userSearchTerm === "" || isNaN(year) || month == null)
-          {
-            $("#errorField").text("Please fill in all Search Fields");
-        }
-
-        else {
             $("#errorField").empty();
-            year = parseInt($("#year").val());
-            newDate = year + month + "01";
+            newDate = yearFrom + monthFrom + "01";
             newDate = newDate.toString();
-            endDate = moment(year + month + "01").endOf('month').format("YYYYMMDD");
+            endDate = moment(yearTo + monthTo + "01").endOf('month').format("YYYYMMDD");
             endDate = endDate.toString();
-
             renderArticles();
-        }
-    });
-
-    $(".dropdown-item").on("click", function(event) {
-        
-        event.preventDefault();
-
-        month = $(this).attr("data-mon");
-        $("#dropdownMonth").text(($(this).text()));
-        
-    });
-
-    $("#nextYear").on("click", function(event) {
-        
-        event.preventDefault();
-
-        year = parseInt($("#year").val());
-        if (isNaN(year)) {
-            year = 1999;
-        }
-        year = year + 1; 
-        $("#year").val(year);   
-        
-    });
-
-    $("#previousYear").on("click", function(event) {
-       
-        event.preventDefault();
-
-        year = parseInt($("#year").val());
-        year = parseInt($("#year").val());
-        if (isNaN(year)) {
-            year = 2001;
-        }
-        year = year - 1; 
-        $("#year").val(year);   
         
     });
 
@@ -77,16 +86,16 @@ $(document).ready(function() {
         $("#year").val("");
         $("#article-section").empty();
     });
-        
-
 
     function renderArticles() {
 
+        if (userSearchTerm === "") {
+            $("#errorField").text("Please Enter a Keyword to Search For.");
+        }
 
-        if (userSearchTerm !== "" && year) {
+        if (userSearchTerm !== "") {
 
-            if (year > 2005) {
-
+            if (yearTo > 2005) {
 
                     var url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
                     url += '?' + $.param({
@@ -134,9 +143,8 @@ $(document).ready(function() {
                 });
             }
 
-            if (year <= 2005) {
+            if (yearTo <= 2005) {
 
- 
                 var url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
                 url += '?' + $.param({
                   'api-key': "b3319917b4b54c0ba4a7eb463d0099d9",
@@ -158,7 +166,6 @@ $(document).ready(function() {
                  
                      for (var i = 0; i < numberArticles; i++) {
                      
- 
                         var headlineLink = test.response.docs[i].web_url;
                         var headliner = test.response.docs[i].headline.main;
                 
@@ -178,8 +185,6 @@ $(document).ready(function() {
                  });
              }
         }
-
-        
        
     }
 });

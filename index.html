@@ -13,6 +13,8 @@
   <!-- Font Awesome CSS Icons (For cool glyphicons) -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" />
   <link rel="stylesheet" href="assets/css/css.css"/>
+  <link rel="stylesheet" href="assets/css/ion.rangeSlider.css"/>
+  <link rel="stylesheet" href="assets/css/ion.rangeSlider.skinNice.css"/>
 
   <!-- Style to fix the issue of text extending past card length -->
   
@@ -35,26 +37,7 @@
            <!--Keyword Field-->
            <div class="input-group">
               <input type="text" class="form-control" id="searchInput" placeholder="Enter Keyword(s)" aria-label="" aria-describedby="basic-addon1">
-           <!--Month Search Field-->
-            <div class="btn-group">
-              <button type="button" id="dropdownMonth" style="width:100px" class="btn btn-secondary-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Month
-              </button>
-              <div class="dropdown-menu">
-                <button class="dropdown-item" type="button" data-mon="01">Jan.</button><button class="dropdown-item" type="button" data-mon="02">Feb.</button><button class="dropdown-item" type="button" data-mon="03">Mar.</button>
-                <button class="dropdown-item" type="button" data-mon="04">Apr.</button><button class="dropdown-item" type="button" data-mon="05">May</button><button class="dropdown-item" type="button" data-mon="06">June</button>
-                <button class="dropdown-item" type="button" data-mon="07">July</button><button class="dropdown-item" type="button" data-mon="08">Aug.</button><button class="dropdown-item" type="button" data-mon="09">Sept.</button>
-                <button class="dropdown-item" type="button" data-mon="10">Oct.</button><button class="dropdown-item" type="button" data-mon="11">Nov.</button><button class="dropdown-item" type="button" data-mon="12">Dec.</button>
-              </div>
-            </div>
-            <!--Year Search Field-->
-            <div class="input-group-prepend-6">
-                <button class="btn btn-secondary-2" type="button" id="previousYear">- Year</button>
-              </div>
-              <input type="text" class="form-control-4" id="year">
-              <div class="input-group-append-6">
-                  <button class="btn btn-secondary-2" type="button" id="nextYear">+ Year</button>
-              </div>
+
               <!--search button-->
                <div class="input-group-append-6">
                <button class="btn btn-secondary-2" type="button" id="searchArticle">Search</button>
@@ -63,6 +46,16 @@
               <button class="btn btn-secondary-2" type="button" id="clear">Clear</button>
               </div>
           </div>
+    </div>
+    <br>
+    <!--Date Slider-->
+    
+    <div id="slider1">
+      <div id="custom-handle" class="ui-slider-handle"></div>
+    </div>
+    <br>
+    <div id="slider2">
+      <div id="custom-handle" class="ui-slider-handle"></div>
     </div>
 
     <div class="row">
@@ -102,6 +95,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.bundle.min.js"></script>
   <!-- Code to the JavaScript File -->
   <script src="assets/javascript/javascript.js"></script>
+  <script src="assets/javascript/ion.rangeSlider.js"></script>
 
 </body>
 
