@@ -5,12 +5,14 @@ var state = {
     headline: "Something happened",
     snippet: "It was very important and it happened.",
     date: '2000-01-01',
-    url: ''
+    url: '',
+    
   }],
   dataQuery: 'WIKI/FB', // Search box
   newsQuery: 'Facebook',
   newsBegin: '2014-01-01',
-  newsEnd: '2016-01-01'
+  newsEnd: '2016-01-01',
+  message: "Type in a Ticker to Display Stock Price Graph"
 };
 
 // Fetch dataset `code` from Quand. `valIndex` is the array index of the desired value column. Takes a `callback` to call with the processed response data.
@@ -61,20 +63,33 @@ function submitDataQuery(event) {
 var chart = null;
 
 function render() {
+
   $('div#app').empty().append(
-    $('<div id="data-selection">').append(
-      $('<form>').on('submit', submitDataQuery).append(
-        $('<input class="query" type="text" placeholder="Dataset code">')
-          .val(state.dataQuery)
-          .on('change', (e) => state.dataQuery = $(e.currentTarget).val()),
-        $('<input type="submit">')
-          .val("Search"))
-    ),
-    $('<div id="news-selection">').append(
-      $('<input class="query" type="text" placeholder="Search news">')
-        .val(state.newsQuery)
-        .on('change', (e) => state.newsQuery = $(e.currentTarget).val())
-    ),
+    $("<div id='controls'>").addClass("card").append(
+      $("<h2 class='text-center'>").text(state.message),
+      $("<div class='row'>").append(
+        $("<div class='col-md-3'>"),
+        
+        $("<div class='col-md-6'>").append(
+          $("<div class='row form-group'>").append(
+            $("<h4>").text("Ticker"),
+            $('<form>').on('submit', submitDataQuery).append(
+             $('<input class="query" type="text" placeholder="Enter Ticker">')
+              .val(state.dataQuery)
+              .on('change', (e) => state.dataQuery = $(e.currentTarget).val()),
+            $('<input type="submit">')
+              .val("Search"))),
+          
+              $("<div class='row form-group'>").append(    
+            $("<h4>").text("News"),
+            $('<input class="query" type="text" placeholder="Search news">').val(state.newsQuery)
+            .on('change', (e) => state.newsQuery = $(e.currentTarget).val())),
+
+          $("<div class='row form-group'>").append(    
+            $("<h4>").text("Date"))),
+        
+        $("<div class='col-md-3'>"))),
+        
     $('<div id="chart">'),
     $('<div id="news">').append(
       $('<h1>News</h1>'),
