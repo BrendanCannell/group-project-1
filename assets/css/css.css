@@ -1,0 +1,47 @@
+.btn {
+    cursor: pointer;
+    width: 70px;
+    margin: 0 3px;
+}
+
+
+.articleButtons {
+    margin: 5px;
+}
+
+#year {
+    width: 70px;
+    text-align: center;
+}
+
+.toArticleButton {
+    width: 150px;
+    background-color: #20315A;
+    float: left;
+}
+
+.articleCard {
+    margin: 5px;
+
+}
+
+.articleImg {
+    height: 75px;
+    width: 75px;
+    float: left;
+    
+}
+
+p {
+    height: 70px;
+}
+
+#searchField {
+    float: left;
+}
+
+#errorField {
+    margin-left: 20px;
+    color: Red;
+    
+}

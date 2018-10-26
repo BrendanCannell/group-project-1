@@ -1,6 +1,6 @@
 class StockQuery {
   constructor(symbol, update) {
-    this.response = observe({
+    this.response = Utils.observe({
       data: null,
       metadata: null,
     }, update);
@@ -12,7 +12,7 @@ class StockQuery {
       data: {
         api_key: 'UgyTCPiRsSybMnmGJJKA'
       }
-    }).always(receiveAt(this.response, 'data'));
+    }).always(Utils.receiveAt(this.response, 'data'));
 
     $.ajax({
       method: 'GET',
@@ -20,7 +20,7 @@ class StockQuery {
       data: {
         api_key: 'UgyTCPiRsSybMnmGJJKA'
       }
-    }).always(receiveAt(this.response, 'metadata'));
+    }).always(Utils.receiveAt(this.response, 'metadata'));
   }
 
   get success() {
@@ -39,7 +39,7 @@ class StockQuery {
       let namePlusJunk = this.response.metadata.responseJSON.dataset.name;
       let companyName = namePlusJunk.match(/(.*?) \(/)[1]; // Extract the prefix before the first ' ('
 
-      memoize(this, { companyName })
+      Utils.memoize(this, { companyName })
       return companyName;
     } else return null;
   }
@@ -47,14 +47,22 @@ class StockQuery {
   get dataset() {
     if (this.success) {
       let d = this.response.data.responseJSON.dataset_data;
-      let valIndex = d.column_names.indexOf('Close');
+      let valIndex = d.column_names.indexOf('Adj. Close');
       let dataset = {
         dates: d.data.map(datum => datum[0]),
         values: d.data.map(datum => datum[valIndex])
       };
 
-      memoize(this, { dataset })
+      Utils.memoize(this, { dataset })
       return dataset;
     } else return null;
+  }
+
+  get from() {
+    return this.success && new Date(this.response.metadata.responseJSON.dataset.oldest_available_date);
+  }
+
+  get to() {
+    return this.success && new Date(this.response.metadata.responseJSON.dataset.newest_available_date);
   }
 }
