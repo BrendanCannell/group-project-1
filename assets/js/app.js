@@ -1,24 +1,17 @@
-// TODO Progress indicator
-// TODO Failure indicator
-// TODO x-axis
-
-
-
 // Global app class
 class App {
   constructor(bindto) {
     Object.assign(this, {
       ui: {
         bindto,
-        message: "Type in a Stock Symbol to Display Stock Price Graph",
         stockQueryInput: '',
         newsQueryInput: {
           text: '',
-          from: new Date("2010-01-01"),
-          to: new Date("2010-12-01")
+          from: null,
+          to: null
         },
         chart: {
-          element: $('<div id="chart">'),
+          element: $('<div id="chart">').css('height', '320px'),
           c3: null
         },
       },
@@ -36,32 +29,46 @@ class App {
       favs: Utils.autosave(JSON.parse(localStorage.getItem('favs')) || [], 'favs')
     });
 
-    /////slider Variables//////
-    var dayCount = 0;
-
-
-    ///////Month Slider////////
     moment.locale("en-US");
-
-
   }
 
   submitStockQuery() {
-    this.queries.stock.pending = new StockQuery(this.ui.stockQueryInput, this.update.bind(this))
+    this.queries.stock.pending = new StockQuery(this.ui.stockQueryInput, this.update.bind(this));
   }
 
   submitNewsQuery() {
     let input = this.ui.newsQueryInput;
 
-    this.queries.news.pending = new NewsQuery(input.text, input.from, input.to, this.update.bind(this))
+    this.queries.news.pending = new NewsQuery(input.text, input.from, input.to, this.update.bind(this));
   }
 
   update() {
     // Pending queries are moved to current if successful.
-    let s = this.queries.stock;
-    if (s.pending && s.pending.success) {
-      s.current = s.pending;
-      s.pending = null;
+    let stock = this.queries.stock;
+    if (stock.pending && stock.pending.success) {
+      let isFirstDataset = stock.current === null;
+
+      stock.current = stock.pending;
+      stock.pending = null;
+
+      // News query date range may need to be created/adjusted.
+      let input = this.ui.newsQueryInput;
+      
+      if (isFirstDataset) {
+        // The first time, we set from/to to the years of the dataset, Jan 1 to Dec 31.
+        input.from = stock.current.from;
+        input.from.setMonth(0);
+        input.from.setDate(1);
+
+        input.to = stock.current.to;
+        input.to.setMonth(12);
+        input.to.setDate(0);
+      } else {
+        // Every other time, we adjust years if they would fall outside the years of the dataset.
+        // Months are left alone.
+        input.from.setFullYear(Math.max(input.from.getFullYear(), stock.current.from.getFullYear()));
+        input.to.setFullYear(Math.min(input.to.getFullYear(), stock.current.to.getFullYear()));
+      }
     }
 
     let n = this.queries.news;
@@ -75,9 +82,9 @@ class App {
 
   render() {
     let stock = this.queries.stock.current;
-    let stockSuccess = stock && stock.success;
+    let stockPending = this.queries.stock.pending;
     let news = this.queries.news.current;
-    let newsSuccess = news && news.success;
+    let newsPending = this.queries.news.pending;
 
     // Keeps `$($arg)` synced with `obj[prop]`. Otherwise forms would get cleared on every render.
     function $sync($arg, obj, prop) {
@@ -85,42 +92,58 @@ class App {
     }
 
     $(this.ui.bindto).empty().append(
-      $("<div id='controls' class='card'>").append(
-        $("<h2 class='text-center'>").text(this.ui.message),
-        $("<div class='row'>").append(
-          $("<div class='col-md-3'>"),
+      $("<div id='controls' class='card mb-2 px-2 pt-2'>").append(
+        $("<form>")
+          .on('submit', (e) => { e.preventDefault(); this.submitStockQuery() })
+          .append(
+            $("<div class='form-group row'>").append(
+              $('<label for="stock-query" class="col-4 col-form-label text-right">').text("Symbol"),
+              $('<div class="col-4">').append(
+                $sync('<input type="text" id="stock-query" class="form-control" placeholder="e.g., MSFT...">', this.ui, 'stockQueryInput')),
+              $('<div class="col-4 d-flex">').append(
+                $('<input type="submit" class="btn btn-primary mr-2" value="Search">'),
+                stockPending &&
+                (stockPending.failure
+                  ? $('<p class="error">').text("Sorry, data wasn't available for that stock.")
+                  : $('<img class="loading" src="assets/images/loading.gif" alt="Loading...">'))))),
 
-          $("<div class='col-md-6'>").on('submit', (e) => { e.preventDefault(); this.submitStockQuery() }).append(
-            $("<div class='row form-group'>").append(
-              $("<h4>").text("Symbol"),
-              $('<form>').append(
-                $sync('<input class="query" type="text">', this.ui, 'stockQueryInput'),
-                $('<input type="submit" value="Search">'))),
+        $("<form>").addClass(!stock && 'disabled')
+          .on('submit', (e) => { e.preventDefault(); this.queries.stock && this.submitNewsQuery() })
+          .append(
+            $("<div class='form-group row'>").append(
+              $('<label for="stock-query" class="col-4 col-form-label text-right">').text("News"),
+              $('<div class="col-4">').append(
+                $sync(`<input type="text" id="stock-query" class="form-control" placeholder="Search NYT articles" ${stock ? '' : 'disabled'}>`, this.ui.newsQueryInput, 'text')),
+              $('<div class="col-4 d-flex">').append(
+                $('<input type="submit" class="btn btn-primary mr-2" value="Search">'),
+                newsPending &&
+                (newsPending.failure
+                  ? $('<p class="error">').text("Sorry, something went wrong with the New York Times server.")
+                  : $('<img class="loading" src="assets/images/loading.gif" alt="Loading...">'))))),
 
-            $("<div class='row form-group'>").on('submit', (e) => { e.preventDefault(); this.submitNewsQuery() }).append(
-              $("<h4>").text("News"),
-              $('<form>').append(
-                $sync('<input class="query" type="text">', this.ui.newsQueryInput, 'text'),
-                $('<input type="submit" value="Search">')))),
-
-          $("<div class='col-md-3'>")),
-        $('<div class="row">').append(
+        $('<div class="form-group row">').append(
           $('<div class="col-12">').append(
-            $('<input type="text" class="month slider">').append(
-              $('<div id="custom-handle" class="ui-slider-handle">')),
-            $('<input type="text" class="year slider">').append(
-              $('<div id="custom-handle" class="ui-slider-handle">'))))),
-      $('<h1 class="text-center">').text((stock && stock.companyName) || ''),
-      this.ui.chart.element,
-      $('<div id="news">').append(
-        $('<h1>News</h1>'),
-        newsSuccess && news.articles.map((article) =>
-          $('<div class="article">').append(
-            $(`<a href="${article.url}" target="_blank">`).append($('<h2>').html(article.headline)),
-            $('<p>').text(article.date),
-            $('<p>').html(article.snippet)))));
+            $('<input type="text" class="month slider">'),
+            $('<input type="text" class="year slider">')))),
 
-    if (stockSuccess) {
+      stock &&
+      $('<div class="card mb-2">').append(
+        $('<div class="card-body">').append(
+          $('<h2 class="card-title text-center mb-4">').text(stock.companyName),
+          this.ui.chart.element)),
+
+      news &&
+      $('<div id="news" class="card">').append(
+        $('<div class="card-body">').append(
+          $('<h2 class="card-title text-center mb-4">News</h1>'),
+          news.articles.map((article) =>
+            $('<div class="article card mb-2">').append(
+              $('<div class="card-body">').append(
+                $(`<a class="card-title" href="${article.url}" target="_blank">`).append($('<h2>').html(article.headline)),
+                $('<p>').text(moment(article.date).format('ddd, MMM Do YYYY')),
+                $('<p>').html(article.snippet)))))));
+
+    if (stock) {
       var ticks = [];
       let span = stock.to.getFullYear() - stock.from.getFullYear();
       for (let year = stock.from.getFullYear(); year <= stock.to.getFullYear(); year++) {
@@ -138,89 +161,71 @@ class App {
         ? (year) => year.getMonth() === 0 ? year.getFullYear() : ''
         : (year) => year.getFullYear() % 5 === 0 ? year.getFullYear() : '';
 
-      if (!this.ui.chart.c3) {
-        this.ui.chart.c3 = c3.generate({
-          bindto: this.ui.bindto + ' #chart',
-          data: {
-            onclick: (d) => this.queries.news.pending = new NewsQuery(this.ui.newsQueryInput.text, d.x.getFullYear(), d.x.getMonth(), this.update.bind(this)), // Chart click handler
-            xs: {
-              'datasetValuesY': 'datasetDates',
-              'datasetValuesY2': 'datasetDates'
-            },
-            columns: [
-              ['datasetDates', ...stock.dataset.dates],
-              ['datasetValuesY', ...stock.dataset.values],
-              ['datasetValuesY2', ...stock.dataset.values]
-            ],
-            axes: {
-              'datasetValuesY': 'y',
-              'datasetValuesY2': 'y2'
-            },
-            hide: ['datasetValuesY2']
+      this.ui.chart.c3 = c3.generate({
+        bindto: this.ui.bindto + ' #chart',
+        data: {
+          xs: {
+            'datasetValuesY': 'datasetDates',
+            'datasetValuesY2': 'datasetDates'
           },
-          axis: {
-            x: {
-              type: 'timeseries',
-              tick: {
-                values: ticks,
-                format: format,
-                culling: false,
-                outer: false
-              },
-            },
-            y: {
-              show: true,
-              tick: {
-                outer: false
-              }
-            },
-            y2: {
-              show: true,
-              tick: {
-                outer: false
-              }
-            }
-          },
-          legend: {
-            show: false
-          },
-          point: {
-            show: false
-          },
-          tooltip: {
-            show: false
-          }
-        });
-      } else {
-        this.ui.chart.c3.load({
           columns: [
             ['datasetDates', ...stock.dataset.dates],
             ['datasetValuesY', ...stock.dataset.values],
             ['datasetValuesY2', ...stock.dataset.values]
-          ]
-        });
-
-        // C3 doesn't actually let you dynamically update the ticks, but I copied this hack from StackOverflow
-        this.ui.chart.c3.internal.xAxisTickValues = ticks;
-        this.ui.chart.c3.internal.config.axis_x_tick_values = ticks;
-        this.ui.chart.c3.flush();
-      }
+          ],
+          axes: {
+            'datasetValuesY': 'y',
+            'datasetValuesY2': 'y2'
+          },
+          hide: ['datasetValuesY2']
+        },
+        axis: {
+          x: {
+            type: 'timeseries',
+            tick: {
+              values: ticks,
+              format: format,
+              culling: false,
+              outer: false
+            },
+          },
+          y: {
+            show: true,
+            tick: {
+              outer: false
+            }
+          },
+          y2: {
+            show: true,
+            tick: {
+              outer: false
+            }
+          }
+        },
+        legend: {
+          show: false
+        },
+        point: {
+          show: false
+        }
+      });
     }
 
-    $('.month.slider').ionRangeSlider(stockSuccess
+    $('.month.slider').ionRangeSlider(stock
       ? {
         type: "double",
         grid: true,
         min: 1,
         max: 12,
         from: this.ui.newsQueryInput.from.getMonth(),
-        to: this.ui.newsQueryInput.to.getMonth(),
+        to: this.ui.newsQueryInput.to.getMonth() + 1,
         step: 1,
         grid_snap: true,
         prettify: (date) => moment(date, 'MM.YYYY').format("MMM"),
         onChange: (data) => {
-          this.ui.newsQueryInput.from.setMonth(data.from);
+          this.ui.newsQueryInput.from.setMonth(data.from - 1);
           this.ui.newsQueryInput.to.setMonth(data.to);
+          this.ui.newsQueryInput.to.setDate(0);
         }
       }
       : {
@@ -229,7 +234,7 @@ class App {
         hide_from_to: true
       });
 
-    $('.year.slider').ionRangeSlider(stockSuccess
+    $('.year.slider').ionRangeSlider(stock
       ? {
         type: "double",
         grid: true,

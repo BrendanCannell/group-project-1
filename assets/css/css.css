@@ -1,47 +1,18 @@
-.btn {
-    cursor: pointer;
-    width: 70px;
-    margin: 0 3px;
+h1,h2,h3,h4,h5,h6 {
+  line-height: 1
 }
 
+p.error {
+  margin-bottom: 0;
 
-.articleButtons {
-    margin: 5px;
+  font-size: 0.5rem;
+  color: red;
 }
 
-#year {
-    width: 70px;
-    text-align: center;
+img.loading {
+  height: 56px
 }
 
-.toArticleButton {
-    width: 150px;
-    background-color: #20315A;
-    float: left;
-}
-
-.articleCard {
-    margin: 5px;
-
-}
-
-.articleImg {
-    height: 75px;
-    width: 75px;
-    float: left;
-    
-}
-
-p {
-    height: 70px;
-}
-
-#searchField {
-    float: left;
-}
-
-#errorField {
-    margin-left: 20px;
-    color: Red;
-    
+.disabled {
+  opacity: 0.4
 }

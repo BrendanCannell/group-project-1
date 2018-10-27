@@ -18,7 +18,7 @@ class NewsQuery {
         'fq': 'news_desk:("Business" "Business Day" "Financial" "Your Money" )',
         'begin_date': format(from),
         'end_date': format(to),
-        //'fl': "headline,snippet,web_url,pub_date,news_desk,lead_paragraph"
+        'fl': "headline,snippet,web_url,pub_date,news_desk"
       }
     }).always(Utils.receiveAt(proxy, 'response'));
 
@@ -27,6 +27,10 @@ class NewsQuery {
 
   get success() {
     return this.response && this.response.statusText === 'OK';
+  }
+
+  get failure() {
+    return this.response && this.response.statusText !== 'OK';
   }
 
   get articles() {

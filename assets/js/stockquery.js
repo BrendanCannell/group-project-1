@@ -34,6 +34,16 @@ class StockQuery {
     else return null; // Neither failed and at least one is still pending
   }
 
+  get failure() {
+    let s = this.success;
+
+    if (s === true)
+      return false
+    else if (s === false)
+      return true
+    else return null;
+  }
+
   get companyName() {
     if (this.success) {
       let namePlusJunk = this.response.metadata.responseJSON.dataset.name;
