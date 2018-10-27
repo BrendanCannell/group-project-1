@@ -1,1 +1,1 @@
-# News Driven Finance Tracker
+# News Driven Stock Tracker
