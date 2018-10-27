@@ -45,6 +45,8 @@ class App {
   update() {
     // Pending queries are moved to current if successful.
     let stock = this.queries.stock;
+    let news = this.queries.news;
+
     if (stock.pending && stock.pending.success) {
       let isFirstDataset = stock.current === null;
 
@@ -53,7 +55,7 @@ class App {
 
       // News query date range may need to be created/adjusted.
       let input = this.ui.newsQueryInput;
-      
+
       if (isFirstDataset) {
         // The first time, we set from/to to the years of the dataset, Jan 1 to Dec 31.
         input.from = stock.current.from;
@@ -69,15 +71,17 @@ class App {
         input.from.setFullYear(Math.max(input.from.getFullYear(), stock.current.from.getFullYear()));
         input.to.setFullYear(Math.min(input.to.getFullYear(), stock.current.to.getFullYear()));
       }
-    }
 
-    let n = this.queries.news;
-    if (n.pending && n.pending.success) {
-      n.current = n.pending;
-      n.pending = null;
-    }
+      this.render();
+      this.renderChart();
+    } else if (news.pending && news.pending.success) {
+      news.current = news.pending;
+      news.pending = null;
 
-    this.render();
+      this.render();
+    } else {
+      this.render();
+    }
   }
 
   render() {
@@ -137,81 +141,13 @@ class App {
         $('<div class="card-body">').append(
           $('<h2 class="card-title text-center mb-4">News</h1>'),
           news.articles.length === 0
-          ? $('<h3 class="no-results">').text('No results?! @$#*&!!!')
-          : news.articles.map((article) =>
-            $('<div class="article card mb-2">').append(
-              $('<div class="card-body">').append(
-                $(`<a class="card-title" href="${article.url}" target="_blank">`).append($('<h3>').html(article.headline)),
-                $('<p>').text(moment(article.date).format('ddd, MMM Do YYYY')),
-                $('<p>').html(article.snippet)))))));
-
-    if (stock) {
-      var ticks = [];
-      let span = stock.to.getFullYear() - stock.from.getFullYear();
-      for (let year = stock.from.getFullYear(); year <= stock.to.getFullYear(); year++) {
-        let yearstr = '' + year;
-        ticks.push(yearstr + '-01-01');
-
-        if (10 >= span) {
-          ticks.push(yearstr + '-04-01');
-          ticks.push(yearstr + '-07-01');
-          ticks.push(yearstr + '-10-01');
-        }
-      }
-
-      let format = (span <= 20)
-        ? (year) => year.getMonth() === 0 ? year.getFullYear() : ''
-        : (year) => year.getFullYear() % 5 === 0 ? year.getFullYear() : '';
-
-      this.ui.chart.c3 = c3.generate({
-        bindto: this.ui.bindto + ' #chart',
-        data: {
-          xs: {
-            'datasetValuesY': 'datasetDates',
-            'datasetValuesY2': 'datasetDates'
-          },
-          columns: [
-            ['datasetDates', ...stock.dataset.dates],
-            ['datasetValuesY', ...stock.dataset.values],
-            ['datasetValuesY2', ...stock.dataset.values]
-          ],
-          axes: {
-            'datasetValuesY': 'y',
-            'datasetValuesY2': 'y2'
-          },
-          hide: ['datasetValuesY2']
-        },
-        axis: {
-          x: {
-            type: 'timeseries',
-            tick: {
-              values: ticks,
-              format: format,
-              culling: false,
-              outer: false
-            },
-          },
-          y: {
-            show: true,
-            tick: {
-              outer: false
-            }
-          },
-          y2: {
-            show: true,
-            tick: {
-              outer: false
-            }
-          }
-        },
-        legend: {
-          show: false
-        },
-        point: {
-          show: false
-        }
-      });
-    }
+            ? $('<h3 class="no-results">').text('No results?! @$#*&!!!')
+            : news.articles.map((article) =>
+              $('<div class="article card mb-2">').append(
+                $('<div class="card-body">').append(
+                  $(`<a class="card-title" href="${article.url}" target="_blank">`).append($('<h3>').html(article.headline)),
+                  $('<p>').text(moment(article.date).format('ddd, MMM Do YYYY')),
+                  $('<p>').html(article.snippet)))))));
 
     $('.month.slider').ionRangeSlider(stock
       ? {
@@ -255,5 +191,75 @@ class App {
         hide_min_max: true,
         hide_from_to: true
       });
+  }
+
+  renderChart() {
+    let stock = this.queries.stock.current;
+
+    var ticks = [];
+    let span = stock.to.getFullYear() - stock.from.getFullYear();
+    for (let year = stock.from.getFullYear(); year <= stock.to.getFullYear(); year++) {
+      let yearstr = '' + year;
+      ticks.push(yearstr + '-01-01');
+
+      if (10 >= span) {
+        ticks.push(yearstr + '-04-01');
+        ticks.push(yearstr + '-07-01');
+        ticks.push(yearstr + '-10-01');
+      }
+    }
+
+    let format = (span <= 20)
+      ? (year) => year.getMonth() === 0 ? year.getFullYear() : ''
+      : (year) => year.getFullYear() % 5 === 0 ? year.getFullYear() : '';
+
+    this.ui.chart.c3 = c3.generate({
+      bindto: this.ui.bindto + ' #chart',
+      data: {
+        xs: {
+          'datasetValuesY': 'datasetDates',
+          'datasetValuesY2': 'datasetDates'
+        },
+        columns: [
+          ['datasetDates', ...stock.dataset.dates],
+          ['datasetValuesY', ...stock.dataset.values],
+          ['datasetValuesY2', ...stock.dataset.values]
+        ],
+        axes: {
+          'datasetValuesY': 'y',
+          'datasetValuesY2': 'y2'
+        },
+        hide: ['datasetValuesY2']
+      },
+      axis: {
+        x: {
+          type: 'timeseries',
+          tick: {
+            values: ticks,
+            format: format,
+            culling: false,
+            outer: false
+          },
+        },
+        y: {
+          show: true,
+          tick: {
+            outer: false
+          }
+        },
+        y2: {
+          show: true,
+          tick: {
+            outer: false
+          }
+        }
+      },
+      legend: {
+        show: false
+      },
+      point: {
+        show: false
+      }
+    });
   }
 }
