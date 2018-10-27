@@ -34,12 +34,18 @@ class App {
 
   submitStockQuery() {
     this.queries.stock.pending = new StockQuery(this.ui.stockQueryInput, this.update.bind(this));
+    $('#stock-button .error').detach();
+    $('#stock-button .loading').detach();
+    $('#stock-button').append($('<img class="loading" src="assets/images/loading.gif" alt="Loading...">'));
   }
 
   submitNewsQuery() {
     let input = this.ui.newsQueryInput;
 
     this.queries.news.pending = new NewsQuery(input.text, input.from, input.to, this.update.bind(this));
+    $('#news-button .error').detach();
+    $('#news-button .loading').detach();
+    $('#news-button').append($('<img class="loading" src="assets/images/loading.gif" alt="Loading...">'));
   }
 
   update() {
@@ -104,7 +110,7 @@ class App {
               $('<label for="stock-query" class="col-4 col-form-label text-right">').text("Symbol"),
               $('<div class="col-4">').append(
                 $sync('<input type="text" id="stock-query" class="form-control" placeholder="e.g., MSFT...">', this.ui, 'stockQueryInput')),
-              $('<div class="col-4 d-flex">').append(
+              $('<div class="col-4 d-flex" id="stock-button">').append(
                 $('<input type="submit" class="btn btn-primary mr-2" value="Search">'),
                 stockPending &&
                 (stockPending.failure
@@ -118,7 +124,7 @@ class App {
               $('<label for="stock-query" class="col-4 col-form-label text-right">').text("News"),
               $('<div class="col-4">').append(
                 $sync(`<input type="text" id="stock-query" class="form-control" placeholder="Search NYT articles" ${stock ? '' : 'disabled'}>`, this.ui.newsQueryInput, 'text')),
-              $('<div class="col-4 d-flex">').append(
+              $('<div class="col-4 d-flex" id="news-button">').append(
                 $('<input type="submit" class="btn btn-primary mr-2" value="Search">'),
                 newsPending &&
                 (newsPending.failure
