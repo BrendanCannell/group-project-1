@@ -118,7 +118,7 @@ class App {
                 $('<input type="submit" class="btn btn-primary mr-2" value="Search">'),
                 newsPending &&
                 (newsPending.failure
-                  ? $('<p class="error">').text("Sorry, something went wrong with the New York Times server.")
+                  ? $('<p class="error">').text("Sorry, the New York Times said no.")
                   : $('<img class="loading" src="assets/images/loading.gif" alt="Loading...">'))))),
 
         $('<div class="form-group row">').append(
@@ -136,10 +136,12 @@ class App {
       $('<div id="news" class="card">').append(
         $('<div class="card-body">').append(
           $('<h2 class="card-title text-center mb-4">News</h1>'),
-          news.articles.map((article) =>
+          news.articles.length === 0
+          ? $('<h3 class="no-results">').text('No results?! @$#*&!!!')
+          : news.articles.map((article) =>
             $('<div class="article card mb-2">').append(
               $('<div class="card-body">').append(
-                $(`<a class="card-title" href="${article.url}" target="_blank">`).append($('<h2>').html(article.headline)),
+                $(`<a class="card-title" href="${article.url}" target="_blank">`).append($('<h3>').html(article.headline)),
                 $('<p>').text(moment(article.date).format('ddd, MMM Do YYYY')),
                 $('<p>').html(article.snippet)))))));
 
