@@ -259,6 +259,13 @@ class App {
       },
       point: {
         show: false
+      },
+      tooltip: {
+        format: {
+          title: (x) => moment(x).format('ddd, MMM Do YYYY'),
+          name: () => 'Adj. Closing',
+          value: (value) => '$' + Math.round(value * 1000) / 1000
+        }
       }
     });
   }
