@@ -1,1 +1,1 @@
-# group-project-1
+# News Driven Finance Tracker
