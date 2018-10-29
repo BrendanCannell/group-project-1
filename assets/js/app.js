@@ -168,6 +168,8 @@ class App {
         grid_snap: true,
         prettify: (date) => moment(date, 'MM.YYYY').format("MMM"),
         onChange: (data) => {
+          let fromYear = input.from.getFullYear();
+          let toYear = input.to.getFullYear();
           input.from = new Date(fromYear, data.from - 1, 1);
           // new Date(year, nextMonth, 0)  ->  new Date(year, thisMonth, lastDateOfThisMonth)
           input.to = new Date(toYear, data.to, 0);
