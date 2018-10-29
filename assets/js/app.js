@@ -155,21 +155,22 @@ class App {
                   $('<p>').text(moment(article.date).format('ddd, MMM Do YYYY')),
                   $('<p>').html(article.snippet)))))));
 
+    let input = this.ui.newsQueryInput;
     $('.month.slider').ionRangeSlider(stock
       ? {
         type: "double",
         grid: true,
         min: 1,
         max: 12,
-        from: this.ui.newsQueryInput.from.getMonth(),
-        to: this.ui.newsQueryInput.to.getMonth() + 1,
+        from: input.from.getMonth() + 1,
+        to: input.to.getMonth() + 1,
         step: 1,
         grid_snap: true,
         prettify: (date) => moment(date, 'MM.YYYY').format("MMM"),
         onChange: (data) => {
-          this.ui.newsQueryInput.from.setMonth(data.from - 1);
-          this.ui.newsQueryInput.to.setMonth(data.to);
-          this.ui.newsQueryInput.to.setDate(0);
+          input.from = new Date(fromYear, data.from - 1, 1);
+          // new Date(year, nextMonth, 0)  ->  new Date(year, thisMonth, lastDateOfThisMonth)
+          input.to = new Date(toYear, data.to, 0);
         }
       }
       : {
@@ -184,12 +185,12 @@ class App {
         grid: true,
         min: stock.from.getFullYear(),
         max: stock.to.getFullYear(),
-        from: this.ui.newsQueryInput.from.getFullYear(),
-        to: this.ui.newsQueryInput.to.getFullYear(),
+        from: input.from.getFullYear(),
+        to: input.to.getFullYear(),
         prettify_enabled: false,
         onChange: (data) => {
-          this.ui.newsQueryInput.from.setFullYear(data.from);
-          this.ui.newsQueryInput.to.setFullYear(data.to);
+          input.from.setFullYear(data.from);
+          input.to.setFullYear(data.to);
         }
       }
       : {
